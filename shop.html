@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>_fresh_nails_shop — Магазин гель-лаків та баз</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #333;
+      margin: 0; padding: 0;
+    }
+    header, footer {
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      position: relative;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+    h1, h2 {
+      color: #111;
+      margin: 0 0 15px;
+    }
+
+    /* Кошик зверху праворуч */
+    #cart {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      background: #222;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+    }
+
+    /* Сітка товарів в один рядок */
+    .products {
+      display: flex;
+      gap: 15px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    .product {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 220px;
+      flex-shrink: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fafafa;
+    }
+    .product img {
+      max-width: 180px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .product h3 {
+      font-size: 18px;
+      margin: 5px 0;
+      text-align: center;
+    }
+    .price {
+      font-weight: bold;
+      margin: 5px 0;
+      color: #000;
+    }
+    .availability {
+      margin: 5px 0 10px;
+      font-weight: bold;
+    }
+    .available {
+      color: green;
+    }
+    .out-of-stock {
+      color: red;
+    }
+    .qty-label {
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    input[type=number] {
+      width: 60px;
+      padding: 5px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    button.buy-btn {
+      background-color: #000;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background-color 0.3s ease;
+    }
+    button.buy-btn:disabled {
+      background-color: #888;
+      cursor: not-allowed;
+    }
+
+    /* Відображення корзини під товарами */
+    #cart-details {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 10px 15px;
+      border-top: 2px solid #000;
+      font-size: 16px;
+    }
+    #cart-details h3 {
+      margin-top: 0;
+    }
+    #cart-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #cart-list li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>_fresh_nails_shop</h1>
+    <div id="cart" title="Переглянути кошик">🛒 Кошик: <span id="cart-count">0</span> товарів — <span id="cart-total">0</span> грн</div>
+  </header>
+
+  <div class="container">
+    <h2>Наші товари</h2>
+    <div class="products" id="products-container">
+      <!-- Товари будуть тут через JS -->
+    </div>
+
+    <div id="cart-details" style="display:none;">
+      <h3>Вміст кошика:</h3>
+      <ul id="cart-list"></ul>
+      <p><strong>Загальна сума:</strong> <span id="cart-final-total">0</span> грн</p>
+      <button id="clear-cart">Очистити кошик</button>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 _fresh_nails_shop. Усі права захищено.
+  </footer>
+
+<script>
+  // Масив товарів
+  const products = [
+    {
+      id: 1,
+      name: "MOON — база для гель-лаку",
+      price: 150,
+      available: true,
+      img: "https://i.imgur.com/vgMVRF6.jpg"
+    },
+    {
+      id: 2,
+      name: "Гель-лак COLOR RED",
+      price: 120,
+      available: true,
+      img: "https://i.imgur.com/4Jp1wrq.jpg"
+    },
+    {
+      id: 3,
+      name: "Топ для гель-лаку SHINY",
+      price: 130,
+      available: false,
+      img: "https://i.imgur.com/kbS6Th7.jpg"
+    },
+    {
+      id: 4,
+      name: "Праймер кислотний",
+      price: 90,
+      available: true,
+      img: "https://i.imgur.com/3cu5dxK.jpg"
+    },
+    {
+      id: 5,
+      name: "Праймер безкислотний",
+      price: 100,
+      available: true,
+      img: "https://i.imgur.com/Z7xWZk3.jpg"
+    },
+    {
+      id: 6,
+      name: "Ремувер для гель-лаку",
+      price: 80,
+      available: true,
+      img: "https://i.imgur.com/t3GLrYc.jpg"
+    },
+    {
+      id: 7,
+      name: "Живильне масло для кутикули",
+      price: 110,
+      available: false,
+      img: "https://i.imgur.com/pEApBDj.jpg"
+    },
+    {
+      id: 8,
+      name: "База з глянцевим фінішем",
+      price: 160,
+      available: true,
+      img: "https://i.imgur.com/FJmDXOV.jpg"
+    },
+    {
+      id: 9,
+      name: "Гель-лак BLUE OCEAN",
+      price: 120,
+      available: true,
+      img: "https://i.imgur.com/O6vQec3.jpg"
+    },
+    {
+      id: 10,
+      name: "Гель-лак PINK ROSE",
+      price: 120,
+      available: true,
+      img: "https://i.imgur.com/s8e2LmF.jpg"
+    }
+  ];
+
+  const productsContainer = document.getElementById("products-container");
+  const cartCountElem = document.getElementById("cart-count");
+  const cartTotalElem = document.getElementById("cart-total");
+  const cartDetails = document.getElementById("cart-details");
+  const cartList = document.getElementById("cart-list");
+  const cartFinalTotal = document.getElementById("cart-final-total");
+  const clearCartBtn = document.getElementById("clear-cart");
+
+  let cart = [];
+
+  // Функція для створення товарів в HTML
+  function renderProducts() {
+    products.forEach(product => {
+      const productDiv = document.createElement("div");
+      productDiv.classList.add("product");
+      productDiv.innerHTML = `
+        <img src="${product.img}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p class="price">${product.price} грн</p>
+        <p class="availability ${product.available ? 'available' : 'out-of-stock'}">
+          ${product.available ? "✅ В наявності" : "❌ Немає в наявності"}
+        </p>
+        <label class="qty-label" for="qty-${product.id}">Кількість:</label>
+        <input type="number" id="qty-${product.id}" min="1" max="99" value="1" ${!product.available ? 'disabled' : ''}>
+        <button class="buy-btn" data-id="${product.id}" ${!product.available ? 'disabled' : ''}>Додати в кошик</button>
+      `;
+      productsContainer.appendChild(productDiv);
+    });
+  }
+
+  // Оновлення кошика в хедері
+  function updateCartDisplay() {
+    const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
+    const totalPrice = cart.reduce((acc, item) => {
+      const product = products.find(p => p.id === item.id);
+      return acc + product.price * item.qty;
+    }, 0);
+
+    cartCountElem.textContent = totalCount;
+    cartTotalElem.textContent = totalPrice;
+
+    if(totalCount > 0) {
+      cartDetails.style.display = "block";
+    } else {
+      cartDetails.style.display = "none";
+    }
+
+    // Оновлення списку вмісту кошика
+    cartList.innerHTML = "";
+    cart.forEach(item => {
+      const product = products.find(p => p.id === item.id);
+      const li = document.createElement("li");
+      li.textContent = `${product.name} — ${item.qty} шт — ${product.price * item.qty} грн`;
+      cartList.appendChild(li);
+    });
+    cartFinalTotal.textContent = totalPrice;
+  }
+
+  // Додавання в кошик
+  function addToCart(id, qty) {
+    const product = products.find(p => p.id === id);
+    if (!product || !product.available) return;
+
+    const existingItem = cart.find(item => item.id === id);
+    if (existingItem) {
+      existingItem.qty += qty;
+    } else {
+      cart.push({ id, qty });
+    }
+    updateCartDisplay();
+  }
+
+  // Обробник кнопок "Додати в кошик"
+  productsContainer.addEventListener("click", e => {
+    if (e.target.classList.contains("buy-btn")) {
+      const id = Number(e.target.dataset.id);
+      const qtyInput = document.getElementById(`qty-${id}`);
+      const qty = Number(qtyInput.value);
+      if (qty > 0 && qty <= 99) {
+        addToCart(id, qty);
+        qtyInput.value = 1; // скидаємо поле кількості після додавання
+      }
+    }
+  });
+
+  // Кнопка очистити кошик
+  clearCartBtn.addEventListener("click", () => {
+    cart = [];
+    updateCartDisplay();
+  });
+
+  // Показати/сховати кошик при натисканні
+  const cartElem = document.getElementById("cart");
+  cartElem.addEventListener("click", () => {
+    if (cartDetails.style.display === "none" || cartDetails.style.display === "") {
+      cartDetails.style.display = "block";
+    } else {
+      cartDetails.style.display = "none";
+    }
+  });
+
+  // Початкова отрисовка
+  renderProducts();
+  updateCartDisplay();
+
+</script>
+
+</body>
+</html>
